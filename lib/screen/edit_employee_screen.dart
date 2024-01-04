@@ -14,6 +14,7 @@ class EditEmployeeScreen extends StatefulWidget {
 }
 
 class _EditEmployeeScreenState extends State<EditEmployeeScreen> {
+  final _formKey = GlobalKey<FormState>();
   late AppDb _db;
   late EmployeeData _employeeData;
   final TextEditingController _userNameController = TextEditingController();
@@ -49,7 +50,7 @@ class _EditEmployeeScreenState extends State<EditEmployeeScreen> {
         actions: [
           IconButton(
             onPressed: () {
-              addEmployee();
+              editEmployee();
             },
             icon: const Icon(
               Icons.save,
@@ -62,19 +63,25 @@ class _EditEmployeeScreenState extends State<EditEmployeeScreen> {
         padding: const EdgeInsets.all(8.0),
         child: Column(
           children: [
-            CustomTextFormField(controller: _userNameController, txtLabel: "UserName"),
-            const SizedBox(height: 20.0),
-            CustomTextFormField(controller: _firstNameController, txtLabel: "First Name"),
-            const SizedBox(height: 20.0),
-            CustomTextFormField(controller: _lastNameController, txtLabel: "Last Name"),
-            const SizedBox(height: 20.0),
-            CustomDatePickerFormFiled(
-                controller: _dateOfBirthController,
-                txtLabel: "Date of Birth",
-                callback: () {
-                  pickDateOfBirth(context);
-                }),
-            const SizedBox(height: 20.0),
+            Form(
+                key: _formKey,
+                child: Column(
+                  children: [
+                    CustomTextFormField(controller: _userNameController, txtLabel: "UserName"),
+                    const SizedBox(height: 20.0),
+                    CustomTextFormField(controller: _firstNameController, txtLabel: "First Name"),
+                    const SizedBox(height: 20.0),
+                    CustomTextFormField(controller: _lastNameController, txtLabel: "Last Name"),
+                    const SizedBox(height: 20.0),
+                    CustomDatePickerFormFiled(
+                        controller: _dateOfBirthController,
+                        txtLabel: "Date of Birth",
+                        callback: () {
+                          pickDateOfBirth(context);
+                        }),
+                    const SizedBox(height: 20.0),
+                  ],
+                )),
           ],
         ),
       ),
@@ -111,22 +118,26 @@ class _EditEmployeeScreenState extends State<EditEmployeeScreen> {
     });
   }
 
-  void addEmployee() {
-    final entity = EmployeeCompanion(
-      userName: drift.Value(_userNameController.text),
-      firstName: drift.Value(_firstNameController.text),
-      lastName: drift.Value(_lastNameController.text),
-      dateOfBirth: drift.Value(_dateOfBirth!),
-    );
-    _db.insertEmployee(entity).then((value) => ScaffoldMessenger.of(context).showMaterialBanner(MaterialBanner(
-          content: Text("New employee inserted: $value"),
-          actions: [
-            TextButton(
-              onPressed: () => ScaffoldMessenger.of(context).hideCurrentMaterialBanner(),
-              child: Text("close"),
-            )
-          ],
-        )));
+  void editEmployee() {
+    final isValid = _formKey.currentState?.validate();
+    if (isValid != null && isValid) {
+      final entity = EmployeeCompanion(
+        id: drift.Value(widget.id),
+        userName: drift.Value(_userNameController.text),
+        firstName: drift.Value(_firstNameController.text),
+        lastName: drift.Value(_lastNameController.text),
+        dateOfBirth: drift.Value(_dateOfBirth!),
+      );
+      _db.updateEmployee(entity).then((value) => ScaffoldMessenger.of(context).showMaterialBanner(MaterialBanner(
+            content: Text("Employee updated: $value"),
+            actions: [
+              TextButton(
+                onPressed: () => ScaffoldMessenger.of(context).hideCurrentMaterialBanner(),
+                child: Text("close"),
+              )
+            ],
+          )));
+    }
   }
 
   Future<void> getEmployee() async {
