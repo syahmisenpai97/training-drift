@@ -52,16 +52,33 @@ class _HomeScreenState extends State<HomeScreen> {
               itemCount: employees.length,
               itemBuilder: (context, index) {
                 final employee = employees[index];
-                return Card(
-                  child: Column(
-                    children: [
-                      Text(employee.id.toString()),
-                      Text(employee.userName.toString()),
-                      Text(employee.firstName.toString()),
-                      Text(employee.lastName.toString()),
-                      Text(employee.dateOfBirth.toString()),
-                    ],
+                return GestureDetector(
+                  child: Card(
+                    color: Colors.green[300],
+                    shape: RoundedRectangleBorder(
+                        side: BorderSide(
+                          color: Colors.green,
+                          style: BorderStyle.solid,
+                          width: 1.2,
+                        ),
+                        borderRadius: BorderRadius.only(topLeft: Radius.circular(16.0), bottomRight: Radius.circular(16.0))),
+                    child: Padding(
+                      padding: const EdgeInsets.all(12.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(employee.id.toString()),
+                          Text(employee.userName.toString()),
+                          Text(employee.firstName.toString()),
+                          Text(employee.lastName.toString()),
+                          Text(employee.dateOfBirth.toString()),
+                        ],
+                      ),
+                    ),
                   ),
+                  onTap: () {
+                    Navigator.pushNamed(context, "/edit_employee", arguments: employee.id);
+                  },
                 );
               },
             );
