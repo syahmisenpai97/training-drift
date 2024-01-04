@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:js_util';
 
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
@@ -20,5 +21,26 @@ LazyDatabase _openConnection() {
 class AppDb extends _$AppDb {
   AppDb() : super(_openConnection());
 
+  @override
   int get schemaVersion => 1;
+
+  Future<List<EmployeeData>> getEmployees() async {
+    return await select(employee).get();
+  }
+
+  Future<EmployeeData> getEmployee(int id) async {
+    return await (select(employee)..where((tbl) => tbl.id.equals(id))).getSingle();
+  }
+
+  Future<bool> updateEmployee(EmployeeCompanion entity) async {
+    return await update(employee).replace(entity);
+  }
+
+  Future<int> insertEmployee(EmployeeCompanion entity) async {
+    return await into(employee).insert(entity);
+  }
+
+//   Future<int> deleteEmployee(int id) async {
+//   return await (delete(employee,employee)..where((tbl) => tbl.id.equals(id))).go();
+// }
 }
