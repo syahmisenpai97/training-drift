@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:js_util';
 
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
